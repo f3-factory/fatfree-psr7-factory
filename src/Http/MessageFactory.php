@@ -4,19 +4,10 @@
  *
  * Copyright (c) 2022 F3::Factory, All rights reserved.
  *
- * This file is part of the Fat-Free Framework (http://fatfreeframework.com).
+ * This file is an extension to the Fat-Free Framework (http://fatfreeframework.com).
  *
- * This is free software: you can redistribute it and/or modify it under the
- * terms of the GNU General Public License as published by the Free Software
- * Foundation, either version 3 of the License, or later.
- *
- * Fat-Free Framework is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with Fat-Free Framework. If not, see <http://www.gnu.org/licenses/>.
+ * @author ikkez <ikkez0n3@gmail.com>
+ * @license MIT
  */
 
 namespace F3\Http;
@@ -98,16 +89,16 @@ class MessageFactory {
     {
         foreach ($this->f3->HEADERS as $key => $value) {
             $request = $request->withHeader($key,
-                array_map('trim',explode(',',$value)));
+                \array_map('trim',\explode(',',$value)));
         }
         if (!$this->f3->CLI) {
-            list(,$version) = explode('/',$this->f3->SERVER['SERVER_PROTOCOL']);
+            list(,$version) = \explode('/',$this->f3->SERVER['SERVER_PROTOCOL']);
             $request = $request->withProtocolVersion($version);
         }
         $sf = $this->f3->make(StreamFactoryInterface::class);
         if ($this->f3->RAW || $this->f3->BODY) {
             if ($this->f3->RAW && !$this->f3->BODY) {
-                $res = fopen('php://input','r');
+                $res = \fopen('php://input','r');
                 $stream = $sf->createStreamFromResource($res);
             }
             if ($this->f3->BODY)
@@ -143,11 +134,11 @@ class MessageFactory {
         if ($this->f3->FILES) {
             $uff = $this->f3->make(UploadedFileFactoryInterface::class);
             $fetch = function($arr) use (&$fetch) {
-                if (!is_array($arr))
+                if (!\is_array($arr))
                     return [$arr];
                 $data = [];
                 foreach ($arr as $sub)
-                    $data = array_merge($data, $fetch($sub));
+                    $data = \array_merge($data, $fetch($sub));
                 return $data;
             };
             $out = [];
