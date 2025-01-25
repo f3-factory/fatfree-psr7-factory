@@ -2,7 +2,7 @@
 
 /**
  *
- * Copyright (c) 2022 F3::Factory, All rights reserved.
+ * Copyright (c) 2022-2025 F3::Factory, All rights reserved.
  *
  * This file is an extension to the Fat-Free Framework (http://fatfreeframework.com).
  *
@@ -13,6 +13,7 @@
 namespace F3\Http;
 
 use F3\Base;
+use F3\Http\Factory\Psr17Factory;
 use F3\Prefab;
 use Psr\Http\Message\{RequestFactoryInterface,
     RequestInterface,
@@ -57,6 +58,28 @@ class MessageFactory {
     }
 
     /**
+     * register all own default factories
+     */
+    public static function registerDefaults(): static {
+        $clazzName = Psr17Factory::class;
+        $psrAdapter = static::instance();
+        // register the factories:
+        $psrAdapter->register(
+            requestFactory:       $clazzName,
+            responseFactory:      $clazzName,
+            serverRequestFactory: $clazzName,
+            uploadedFileFactory:  $clazzName,
+            uriFactory:           $clazzName,
+            streamFactory:        $clazzName,
+        );
+        // register the concrete Request / Response objects
+        $psrAdapter->registerRequest(\F3\Http\Request::class);
+        $psrAdapter->registerResponse(\F3\Http\Response::class);
+        $psrAdapter->registerServerRequest(\F3\Http\ServerRequest::class);
+        return $psrAdapter;
+    }
+
+    /**
      * register Request creation shortcut
      */
     public function registerRequest(string $class): void
@@ -85,14 +108,14 @@ class MessageFactory {
     /**
      * common request builder
      */
-    protected function buildRequest(object $request): RequestInterface
+    protected function buildRequest(RequestInterface $request): RequestInterface
     {
         foreach ($this->f3->HEADERS as $key => $value) {
             $request = $request->withHeader($key,
                 \array_map('trim',\explode(',',$value)));
         }
-        if (!$this->f3->CLI) {
-            list(,$version) = \explode('/',$this->f3->SERVER['SERVER_PROTOCOL']);
+        if (!$this->f3->CLI && isset($this->f3->SERVER['SERVER_PROTOCOL'])) {
+            list(,$version) = \explode('/', $this->f3->SERVER['SERVER_PROTOCOL']);
             $request = $request->withProtocolVersion($version);
         }
         $sf = $this->f3->make(StreamFactoryInterface::class);
@@ -110,26 +133,28 @@ class MessageFactory {
     }
 
     /**
-     * receive PSR-7 request object
+     * receive PSR-7 request object, based on the current framework instance
      */
     public function makeRequest(): RequestInterface
     {
         $factory = $this->f3->make(RequestFactoryInterface::class);
-        $request = $factory->createRequest($this->f3->VERB,$this->f3->REALM);
+        $request = $factory->createRequest($this->f3->VERB, $this->f3->REALM);
         return $this->buildRequest($request);
     }
 
     /**
-     * receive PSR-7 server request object
+     * receive PSR-7 server request object, based on the current framework instance
      */
     public function makeServerRequest(): ServerRequestInterface
     {
         $factory = $this->f3->make(ServerRequestFactoryInterface::class);
         $request = $factory->createServerRequest($this->f3->VERB,
-            $this->f3->REALM,$this->f3->SERVER);
-        $request = $this->buildRequest($request)
-            ->withCookieParams($this->f3->COOKIE)
-            ->withQueryParams($this->f3->GET);
+            $this->f3->REALM, $this->f3->SERVER);
+        $request = $this->buildRequest($request);
+        /** @var ServerRequestInterface $request */
+        $request = $request->withCookieParams($this->f3->COOKIE)
+            ->withQueryParams($this->f3->GET)
+            ->withUri($this->f3->URI);
         $sf = $this->f3->make(StreamFactoryInterface::class);
         if ($this->f3->FILES) {
             $uff = $this->f3->make(UploadedFileFactoryInterface::class);
