@@ -1,7 +1,6 @@
 <?php
 
 /**
- *
  * Copyright (c) 2022-2025 F3::Factory, All rights reserved.
  *
  * This file is an extension to the Fat-Free Framework (http://fatfreeframework.com).
@@ -18,6 +17,7 @@ use F3\Prefab;
 use Psr\Http\Message\{RequestFactoryInterface,
     RequestInterface,
     ResponseFactoryInterface,
+    ResponseInterface,
     ServerRequestFactoryInterface,
     ServerRequestInterface,
     StreamFactoryInterface,
@@ -73,8 +73,11 @@ class MessageFactory {
             streamFactory:        $clazzName,
         );
         // register the concrete Request / Response objects
+        $psrAdapter->registerRequest(RequestInterface::class);
         $psrAdapter->registerRequest(\F3\Http\Request::class);
+        $psrAdapter->registerResponse(ResponseInterface::class);
         $psrAdapter->registerResponse(\F3\Http\Response::class);
+        $psrAdapter->registerServerRequest(ServerRequestInterface::class);
         $psrAdapter->registerServerRequest(\F3\Http\ServerRequest::class);
         return $psrAdapter;
     }
