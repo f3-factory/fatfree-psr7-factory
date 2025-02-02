@@ -5,7 +5,7 @@
  *
  * This file is an extension to the Fat-Free Framework (http://fatfreeframework.com).
  *
- * @author ikkez <ikkez0n3@gmail.com>
+ * @author Christian Knuth // ikkez <ikkez0n3@gmail.com>
  * @license MIT
  */
 
@@ -60,7 +60,8 @@ class MessageFactory {
     /**
      * register all own default factories
      */
-    public static function registerDefaults(): static {
+    public static function registerDefaults(): static
+    {
         $clazzName = Psr17Factory::class;
         $psrAdapter = static::instance();
         // register the factories:
