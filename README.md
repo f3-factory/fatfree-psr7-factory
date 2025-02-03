@@ -51,14 +51,19 @@ $psrAdapter->registerResponse(ResponseInterface::class);
 $psrAdapter->registerServerRequest(ServerRequestInterface::class);
 ```
 
-> NB: Instead of the code above, you can use the included shortcut `MessageFactory::registerDefaults()`, which will execute this exact same sequence for you, but it only works with our own fatfree-psr7 package.
+**NB:** Instead of the code above, you can use this included shortcut, which will execute this exact same sequence for you, but it only works with our own fatfree-psr7 package:
+
+```php
+MessageFactory::registerDefaults()
+```
+
 
 Registering the RequestInterface, ServerRequestInterface and ResponseInterface bindings will tell the dependency injection container which shortcut to use to resolve and hydrate the objects accordingly when you type-hinting them in your route controller.
 
 
 ## Usage
 
-You can receive the Request and Response objects now from any point, i.e. from route handlers:
+You can receive the Request and Response objects from any point now, i.e. from route handlers via auto-injection:
 
 ```php
 $f3->route('GET /hallo-world', function(
@@ -73,7 +78,7 @@ $f3->route('GET /hallo-world', function(
 });
 ```
 
-Alternatively you can create a new request objects anywhere manually. These are going to be hydrated from the currently available $_SERVER and hive data via:
+Alternatively you can create a new request object anywhere manually. These are going to be hydrated from the currently available $_SERVER and hive data via:
 
 ```php
 $request = $f3->make(RequestInterface::class);
