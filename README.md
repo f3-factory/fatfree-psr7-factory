@@ -16,6 +16,8 @@ This plugin requires:
   - or any other [PSR7 package](https://packagist.org/providers/psr/http-message-implementation).
 - a [PSR17](https://packagist.org/providers/psr/http-factory-implementation) HTTP message factory implementation (already included in `f3-factory/fatfree-psr7`)
 
+To install this package run:
+
 ```bash
 composer require f3-factory/fatfree-psr7-factory
 ```
@@ -51,14 +53,16 @@ $psrAdapter->registerResponse(ResponseInterface::class);
 $psrAdapter->registerServerRequest(ServerRequestInterface::class);
 ```
 
-**NB:** Instead of the code above, you can use this included shortcut, which will execute this exact same sequence for you, but it only works with our own fatfree-psr7 package:
+**NB:** Instead of the code above, you can use this included shortcut, which will execute the same sequence for you, but it only works with our own fatfree-psr7 package:
 
 ```php
 MessageFactory::registerDefaults()
 ```
 
 
-Registering the RequestInterface, ServerRequestInterface and ResponseInterface bindings will tell the dependency injection container which shortcut to use to resolve and hydrate the objects accordingly when you type-hinting them in your route controller.
+Registering the **RequestInterface**, **ServerRequestInterface** and **ResponseInterface** bindings will tell the dependency injection container which shortcut to use to resolve and hydrate the objects accordingly when you type-hinting them in your route controller. 
+
+This is essential to make the created request objects use the provided make methods by this factory in order to hydrate the objects with the actual data prepared by the framework. Requests use makeRequest/makeServerRequest and are filled with the currently available data from the F3 hive and SERVER globals. The Response factory will check for an existing response object in the `RESPONSE` hive variable and uses that instead to ensure you can pass the response between middlewares, route handlers or any other runtime services via dependency injection. You should return this object in route/middleware handlers, so the framework can care about the rest.
 
 
 ## Usage
@@ -115,5 +119,5 @@ $f3->route('POST /upload', function(Base $app, ServerRequestInterface $request)
 
 For more usage examples see original [PSR Http message readme](https://github.com/php-fig/http-message):
 
-* [`PSR-7 Interfaces Method List`](https://github.com/php-fig/http-message/blob/master/docs/PSR7-Interfaces.md)
-* [`PSR-7 Usage Guide`](https://github.com/php-fig/http-message/blob/master/docs/PSR7-Usage.md)
+* [PSR-7 Interfaces Method List](https://github.com/php-fig/http-message/blob/master/docs/PSR7-Interfaces.md)
+* [PSR-7 Usage Guide](https://github.com/php-fig/http-message/blob/master/docs/PSR7-Usage.md)

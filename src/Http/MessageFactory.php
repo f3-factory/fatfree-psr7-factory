@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright (c) 2022-2025 F3::Factory, All rights reserved.
+ * Copyright (c) 2022-2026 F3::Factory, All rights reserved.
  *
  * This file is an extension to the Fat-Free Framework (http://fatfreeframework.com).
  *
@@ -104,9 +104,10 @@ class MessageFactory {
      */
     public function registerResponse(string $class): void
     {
-        $this->f3->CONTAINER->set($class, fn() => $this->f3
-            ->CONTAINER->get(ResponseFactoryInterface::class)
-            ->createResponse());
+        $this->f3->CONTAINER->set($class, fn() =>
+            $this->f3->RESPONSE ?? $this->f3
+                ->CONTAINER->get(ResponseFactoryInterface::class)
+                ->createResponse());
     }
 
     /**
